@@ -1,4 +1,4 @@
-import { createStory, getActiveStories } from "../services/storyService.js";
+import { createStory, getActiveStories, deleteStory } from "../services/storyService.js";
 
 export const createStoryController = async (req, res) => {
   try {
@@ -23,3 +23,19 @@ export const getActiveStoriesController = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+export const deleteStoryController = async (req, res) => {
+  try {
+    const result = await deleteStory(req.params.storyId, req.user.id);
+    res.json(result);
+  } catch (err) {
+    if (err.message === "Story not found") {
+      return res.status(404).json({ message: err.message });
+    }
+    if (err.message === "Unauthorized") {
+      return res.status(403).json({ message: err.message });
+    }
+    res.status(500).json({ message: err.message });
+  }
+};
+

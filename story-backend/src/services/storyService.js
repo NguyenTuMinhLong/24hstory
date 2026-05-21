@@ -75,3 +75,23 @@ export const getActiveStories = async () => {
 
   return Object.values(groupedStories);
 };
+
+export const deleteStory = async (storyId, userId) => {
+  const story = await prisma.story.findUnique({
+    where: { id: storyId},
+  });
+  if (!story) {
+    throw new Error("Story not found");
+  }
+  if (story.userId !== userId) {
+    throw new Error("Unauthorized");
+  }
+  const publicId = story.mediaUrl.split("/").pop().split(".")[0];
+  await cloudinary.uploader.destroy(`stories/${publicId}`);
+
+  await prisma.story.delete({
+    where: { id: storyId },
+  });
+
+  return { message: "Story deleted" };
+};

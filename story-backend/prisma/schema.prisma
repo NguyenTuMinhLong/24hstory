@@ -8,19 +8,33 @@ generator client {
 }
 
 model User {
-  id       String   @id @default(cuid())
-  email    String   @unique
-  password String
-  avatar   String?
-  createAt DateTime @default(now())
-  stories  Story[]
+  id        String      @id @default(cuid())
+  email     String      @unique
+  password  String
+  avatar    String?
+  createAt  DateTime    @default(now())
+  stories   Story[]
+  StoryView StoryView[]
 }
 
 model Story {
-  id        String   @id @default(cuid())
+  id        String      @id @default(cuid())
   mediaUrl  String
-  createdAt DateTime @default(now())
+  createdAt DateTime    @default(now())
   expiresAt DateTime
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  StoryView StoryView[] 
+}
+
+model StoryView {
+  id       String   @id @default(cuid())
+  userId   String
+  storyId  String
+  viewedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, storyId])
 }

@@ -9,11 +9,12 @@
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
+    "bcrypt": "^6.0.0",
     "cloudinary": "^1.x",
     "cors": "^2.x",
     "dotenv": "^16.x",
     "express": "^4.x",
-    "jsonwebtoken": "^9.x",
+    "jsonwebtoken": "^9.0.3",
     "multer": "^1.x"
   },
   "devDependencies": {

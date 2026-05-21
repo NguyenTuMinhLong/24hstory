@@ -32,10 +32,46 @@ export const createStory = async ({ userId, mediaFilePath }) => {
 
 export const getActiveStories = async () => {
   const stories = await prisma.story.findMany({
-    where: { expiresAt: { gt: new Date() } },
-    include: { user: true },
-    orderBy: { createdAt: "desc" },
+    where: {
+      expiresAt: {
+        gt: new Date(),
+      },
+    },
+
+    include: {
+      user: {
+        select: {
+          id: true,
+          email: true,
+          avatar: true,
+        },
+      },
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 
-  return stories;
+  const groupedStories = {};
+
+  for (const story of stories) {
+    const userId = story.user.id;
+
+    if (!groupedStories[userId]) {
+      groupedStories[userId] = {
+        user: story.user,
+        stories: [],
+      };
+    }
+
+    groupedStories[userId].stories.push({
+      id: story.id,
+      mediaUrl: story.mediaUrl,
+      createdAt: story.createdAt,
+      expiresAt: story.expiresAt,
+    });
+  }
+
+  return Object.values(groupedStories);
 };

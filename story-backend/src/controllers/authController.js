@@ -1,6 +1,7 @@
 import {
     registerUser,
     loginUser,
+    updateAvatar,
 } from "../services/authService.js";
 
 export const registerController = async (req, res) => {
@@ -30,5 +31,18 @@ export const loginController = async (req, res) => {
         res.status(400).json({
             message: err.message,
         });
+    }
+};
+
+export const updateAvatarController = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: "No file" });
+        }
+
+        const user = await updateAvatar(req.user.id, req.file.path);
+        res.json(user);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
 };

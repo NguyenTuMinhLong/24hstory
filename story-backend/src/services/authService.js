@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import cloudinary from "../configs/cloudinary.js";
+import fs from "fs";
 import { prisma } from "../prismaClient.js";
 
 export const registerUser = async ({ email, password}) => {
@@ -52,4 +54,20 @@ export const loginUser = async ({ email, password }) => {
         token,
         user,
     };
-}
+};
+
+export const updateAvatar = async (userId, filePath) => {
+    try {
+        const result = await cloudinary.uploader.upload(filePath, {
+            folder: "avatars",
+        });
+
+        return await prisma.user.update({
+            where: { id: userId },
+            data: { avatar: result.secure_url },
+            select: { id: true, email: true, avatar: true },
+        });
+    } finally {
+        fs.unlinkSync(filePath);
+    }
+};

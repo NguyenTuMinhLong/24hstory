@@ -21,3 +21,19 @@ export const getStoryViewers = async (storyId) => {
     include: { user: { select: { id: true, email: true } } },
   });
 };
+
+export const getMySeenStories = async (userId) => {
+  return await prisma.storyView.findMany({
+    where: { userId },
+    include: {
+      story: {
+        include: {
+          user: {
+            select: { id: true, email: true, avatar: true },
+          },
+        },
+      },
+    },
+    orderBy: { viewedAt: "desc" },
+  });
+};

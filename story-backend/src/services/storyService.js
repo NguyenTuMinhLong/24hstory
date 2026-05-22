@@ -78,7 +78,7 @@ export const getActiveStories = async () => {
 
 export const deleteStory = async (storyId, userId) => {
   const story = await prisma.story.findUnique({
-    where: { id: storyId},
+    where: { id: storyId },
   });
   if (!story) {
     throw new Error("Story not found");
@@ -94,4 +94,36 @@ export const deleteStory = async (storyId, userId) => {
   });
 
   return { message: "Story deleted" };
+};
+
+export const getMyStories = async (userId) => {
+  return await prisma.story.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+  });
+};
+
+export const getStoryById = async (storyId) => {
+  const story = await prisma.story.findUnique({
+    where: { id: storyId },
+    include: {
+      user: {
+        select: {
+          id: true,
+          email: true,
+          avatar: true,
+        },
+      },
+      _count: {
+        select: { StoryView: true },
+      },
+    },
+  });
+  if (!story) {
+    throw new Error("Story not found");
+  }
+  return {
+    ...story,
+    viewCount: story._count.StoryView,
+  };
 };

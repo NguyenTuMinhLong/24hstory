@@ -27,6 +27,20 @@ const storage = multer.diskStorage({
   },
 });
 
+const avatarFilter = (req, file, cb) => {
+  if (ALLOWED_IMAGE_TYPES.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only image files are allowed for avatar"), false);
+  }
+};
+
+export const uploadAvatarMiddleware = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max for avatar
+  fileFilter: avatarFilter,
+});
+
 export const upload = multer({
   storage,
   limits: {

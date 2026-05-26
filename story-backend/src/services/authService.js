@@ -1,4 +1,6 @@
 import bcrypt from "bcrypt";
+import cloudinary from "../configs/cloudinary.js";
+import fs from "fs";
 import { prisma } from "../prismaClient.js";
 import {
   generateAccessToken,
@@ -252,11 +254,41 @@ export const changePassword = async (userId, currentPassword, newPassword) => {
 };
 
 export const updateAvatar = async (userId, filePath) => {
-  return await prisma.user.update({
-    where: { id: userId },
-    data: { avatar: filePath },
-    select: { id: true, email: true, avatar: true },
-  });
+  try {
+    // Get current avatar to delete old one
+    const currentUser = await prisma.user.findUnique({ where: { id: userId } });
+
+    // Delete old avatar from Cloudinary if exists
+    if (currentUser.avatar && currentUser.avatar.includes('cloudinary.com')) {
+      try {
+        const publicId = `avatars/${currentUser.avatar.split('/').pop().split('.')[0]}`;
+        await cloudinary.uploader.destroy(publicId);
+      } catch (deleteErr) {
+        console.error('Failed to delete old avatar:', deleteErr);
+      }
+    }
+
+    const result = await cloudinary.uploader.upload(filePath, {
+      folder: "avatars",
+      width: 400,
+      height: 400,
+      crop: "fill",
+      gravity: "face",
+    });
+
+    fs.unlinkSync(filePath);
+
+    return await prisma.user.update({
+      where: { id: userId },
+      data: { avatar: result.secure_url },
+      select: { id: true, email: true, avatar: true },
+    });
+  } catch (err) {
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+    throw err;
+  }
 };
 
 async function handleFailedLogin(userId, ipAddress) {

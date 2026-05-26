@@ -8,13 +8,73 @@ generator client {
 }
 
 model User {
-  id        String      @id @default(cuid())
-  email     String      @unique
-  password  String
-  avatar    String?
-  createAt  DateTime    @default(now())
-  stories   Story[]
-  StoryView StoryView[]
+  id              String    @id @default(cuid())
+  email           String    @unique
+  password        String
+  avatar          String?
+  isEmailVerified Boolean   @default(false)
+  isActive        Boolean   @default(true)
+  failedLogin     Int       @default(0)
+  lockedUntil     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  stories         Story[]
+  StoryView       StoryView[]
+  sessions        Session[]
+  refreshTokens   RefreshToken[]
+  passwordResets  PasswordReset[]
+  emailVerifications EmailVerification[]
+  loginAttempts   LoginAttempt[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  isRevoked Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordReset {
+  id        String    @id @default(cuid())
+  userId    String
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model EmailVerification {
+  id         String    @id @default(cuid())
+  userId     String
+  token      String    @unique
+  expiresAt  DateTime
+  verifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  userId    String
+  ipAddress String?
+  success   Boolean
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Story {
@@ -32,9 +92,7 @@ model StoryView {
   userId   String
   storyId  String
   viewedAt DateTime @default(now())
-
   user  User  @relation(fields: [userId], references: [id])
   story Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
-
   @@unique([userId, storyId])
 }

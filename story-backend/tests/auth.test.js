@@ -2,29 +2,30 @@ import { jest } from "@jest/globals";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-// Mock modules
-jest.unstable_mockModule("@prisma/client", () => {
-  const mockPrismaClient = {
-    user: {
-      findUnique: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-    },
-  };
-  return { PrismaClient: jest.fn(() => mockPrismaClient) };
-});
+// Mock Prisma
+const mockPrisma = {
+  user: {
+    findUnique: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+  },
+};
 
-jest.unstable_mockModule("../configs/cloudinary.js", () => ({
+// Mock modules before imports
+jest.unstable_mockModule("@prisma/client", () => ({
+  PrismaClient: jest.fn(() => mockPrisma),
+}));
+
+jest.unstable_mockModule("../src/configs/cloudinary.js", () => ({
   default: {
     uploader: {
-      upload: jest.fn(),
+      upload: jest.fn().mockResolvedValue({ secure_url: "https://cloudinary.com/test.jpg" }),
       destroy: jest.fn(),
     },
   },
 }));
 
 // Import after mocking
-const { prisma } = await import("../src/prismaClient.js");
 const { registerUser, loginUser } = await import("../src/services/authService.js");
 
 describe("Auth Service", () => {
@@ -34,15 +35,15 @@ describe("Auth Service", () => {
 
   describe("registerUser", () => {
     it("should throw error if email already exists", async () => {
-      prisma.user.findUnique.mockResolvedValue({ id: "1", email: "test@test.com" });
+      mockPrisma.user.findUnique.mockResolvedValue({ id: "1", email: "test@test.com" });
 
       await expect(registerUser({ email: "test@test.com", password: "password123" }))
         .rejects.toThrow("Email already exists");
     });
 
     it("should create user with hashed password", async () => {
-      prisma.user.findUnique.mockResolvedValue(null);
-      prisma.user.create.mockResolvedValue({
+      mockPrisma.user.findUnique.mockResolvedValue(null);
+      mockPrisma.user.create.mockResolvedValue({
         id: "1",
         email: "new@test.com",
         password: "hashed",
@@ -50,34 +51,46 @@ describe("Auth Service", () => {
 
       const user = await registerUser({ email: "new@test.com", password: "password123" });
 
-      expect(prisma.user.create).toHaveBeenCalledWith({
+      expect(mockPrisma.user.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           email: "new@test.com",
         }),
       });
       expect(user.email).toBe("new@test.com");
     });
+
+    it("should hash password before saving", async () => {
+      mockPrisma.user.findUnique.mockResolvedValue(null);
+      mockPrisma.user.create.mockImplementation(({ data }) =>
+        Promise.resolve({ id: "1", email: data.email, password: data.password })
+      );
+
+      const user = await registerUser({ email: "test@test.com", password: "mypassword" });
+
+      // Password should be hashed (not plain text)
+      expect(user.password).not.toBe("mypassword");
+      expect(user.password).toMatch(/^\$2[ab]\$/); // bcrypt hash prefix
+    });
   });
 
   describe("loginUser", () => {
+    const hashedPassword = bcrypt.hashSync("correctpassword", 10);
+
     it("should throw error if user not found", async () => {
-      prisma.user.findUnique.mockResolvedValue(null);
+      mockPrisma.user.findUnique.mockResolvedValue(null);
 
       await expect(loginUser({ email: "notfound@test.com", password: "password" }))
         .rejects.toThrow("Invalid");
     });
 
     it("should return token and user on successful login", async () => {
-      const hashedPassword = await bcrypt.hash("password123", 10);
-      prisma.user.findUnique.mockResolvedValue({
+      mockPrisma.user.findUnique.mockResolvedValue({
         id: "user-123",
         email: "test@test.com",
         password: hashedPassword,
       });
 
-      process.env.JWT_SECRET = "test-secret";
-
-      const result = await loginUser({ email: "test@test.com", password: "password123" });
+      const result = await loginUser({ email: "test@test.com", password: "correctpassword" });
 
       expect(result).toHaveProperty("token");
       expect(result).toHaveProperty("user");
@@ -85,8 +98,7 @@ describe("Auth Service", () => {
     });
 
     it("should throw error if password is wrong", async () => {
-      const hashedPassword = await bcrypt.hash("correctpassword", 10);
-      prisma.user.findUnique.mockResolvedValue({
+      mockPrisma.user.findUnique.mockResolvedValue({
         id: "user-123",
         email: "test@test.com",
         password: hashedPassword,
@@ -94,6 +106,18 @@ describe("Auth Service", () => {
 
       await expect(loginUser({ email: "test@test.com", password: "wrongpassword" }))
         .rejects.toThrow("Invalid");
+    });
+
+    it("should generate valid JWT token", async () => {
+      const user = { id: "user-123", email: "test@test.com", password: hashedPassword };
+      mockPrisma.user.findUnique.mockResolvedValue(user);
+
+      const result = await loginUser({ email: "test@test.com", password: "correctpassword" });
+
+      // Verify token can be decoded
+      const decoded = jwt.decode(result.token);
+      expect(decoded.id).toBe("user-123");
+      expect(decoded.email).toBe("test@test.com");
     });
   });
 });

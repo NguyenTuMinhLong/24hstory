@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import { Avatar } from '@/components/ui/Avatar'
 import { Progress } from '@/components/ui/Progress'
 
+// Format thời gian tương đối
 const formatTimeAgo = (date) => {
   const now = new Date()
   const diff = now - new Date(date)
@@ -16,6 +17,7 @@ const formatTimeAgo = (date) => {
   return 'Just now'
 }
 
+// Story viewer - xem story với progress bar, navigation
 const StoryViewer = ({ users, initialUserIndex = 0, initialStoryIndex = 0, onClose, onMarkSeen }) => {
   const [currentUserIndex, setCurrentUserIndex] = useState(initialUserIndex)
   const [currentStoryIndex, setCurrentStoryIndex] = useState(initialStoryIndex)
@@ -28,9 +30,10 @@ const StoryViewer = ({ users, initialUserIndex = 0, initialStoryIndex = 0, onClo
   const currentStory = currentUser?.stories[currentStoryIndex]
   const totalStories = currentUser?.stories?.length || 0
 
-  const STORY_DURATION = 5000
+  const STORY_DURATION = 5000 // 5 giây mỗi story
   const progressInterval = 50
 
+  // Chuyển sang story tiếp theo
   const goToNextStory = useCallback(() => {
     if (isTransitioning) return
     setIsTransitioning(true)
@@ -50,6 +53,7 @@ const StoryViewer = ({ users, initialUserIndex = 0, initialStoryIndex = 0, onClo
     setTimeout(() => setIsTransitioning(false), 300)
   }, [currentStoryIndex, totalStories, currentUserIndex, users.length, isTransitioning, onClose])
 
+  // Quay lại story trước
   const goToPrevStory = useCallback(() => {
     if (isTransitioning) return
     setIsTransitioning(true)
@@ -66,12 +70,14 @@ const StoryViewer = ({ users, initialUserIndex = 0, initialStoryIndex = 0, onClo
     setTimeout(() => setIsTransitioning(false), 300)
   }, [currentStoryIndex, currentUserIndex, users, isTransitioning])
 
+  // Đánh dấu đã xem khi story thay đổi
   useEffect(() => {
     if (onMarkSeen && currentStory?.id) {
       onMarkSeen(currentStory.id)
     }
   }, [currentStory?.id, onMarkSeen])
 
+  // Timer tự động chuyển story
   useEffect(() => {
     if (isPaused) {
       if (timerRef.current) clearInterval(timerRef.current)
@@ -93,6 +99,7 @@ const StoryViewer = ({ users, initialUserIndex = 0, initialStoryIndex = 0, onClo
     }
   }, [isPaused, goToNextStory])
 
+  // Xử lý swipe trên mobile
   const handleTouchStart = (e) => {
     const touch = e.touches[0]
     e.target.startX = touch.clientX
@@ -111,6 +118,7 @@ const StoryViewer = ({ users, initialUserIndex = 0, initialStoryIndex = 0, onClo
 
   return (
     <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">
+      {/* Background click to close */}
       <div className="absolute inset-0" onClick={onClose} />
 
       <div
@@ -119,6 +127,7 @@ const StoryViewer = ({ users, initialUserIndex = 0, initialStoryIndex = 0, onClo
         onTouchEnd={handleTouchEnd}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Progress bar */}
         <div className="absolute top-0 left-0 right-0 z-10 p-4">
           <Progress
             value={(currentStoryIndex + 1) / totalStories * 100}
@@ -126,6 +135,7 @@ const StoryViewer = ({ users, initialUserIndex = 0, initialStoryIndex = 0, onClo
           />
         </div>
 
+        {/* Header - user info + close button */}
         <div
           className="absolute top-8 left-4 right-4 z-10 flex items-center justify-between"
           onClick={(e) => e.stopPropagation()}
@@ -151,6 +161,7 @@ const StoryViewer = ({ users, initialUserIndex = 0, initialStoryIndex = 0, onClo
           </button>
         </div>
 
+        {/* Navigation arrows */}
         <div
           className={cn(
             'absolute left-2 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center cursor-pointer text-white/50 hover:text-white z-10',
@@ -171,6 +182,7 @@ const StoryViewer = ({ users, initialUserIndex = 0, initialStoryIndex = 0, onClo
           <ChevronRight size={32} />
         </div>
 
+        {/* Footer - view count */}
         <div
           className="absolute bottom-4 left-4 right-4 z-10 flex items-center justify-between"
           onClick={(e) => e.stopPropagation()}
@@ -181,6 +193,7 @@ const StoryViewer = ({ users, initialUserIndex = 0, initialStoryIndex = 0, onClo
           </div>
         </div>
 
+        {/* Story image - click to pause */}
         <div
           className={cn(
             'w-full h-full flex items-center justify-center',
@@ -195,9 +208,10 @@ const StoryViewer = ({ users, initialUserIndex = 0, initialStoryIndex = 0, onClo
           />
         </div>
 
+        {/* Pause indicator */}
         {isPaused && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-20">
-            <p className="text-white text-sm">Paused</p>
+            <p className="text-white text-sm">Tạm dừng</p>
           </div>
         )}
       </div>

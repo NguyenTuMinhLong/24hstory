@@ -10,7 +10,7 @@ import api from '@/lib/api'
 import toast from 'react-hot-toast'
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  email: z.string().email('Email khong hop le'),
 })
 
 const ForgotPassword = () => {
@@ -31,26 +31,27 @@ const ForgotPassword = () => {
     try {
       await api.post('/auth/forgot-password', data)
       setIsSent(true)
-      toast.success('Password reset email sent!')
+      toast.success('Email dat lai mat khau da duoc gui!')
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to send reset email')
+      toast.error(error.response?.data?.message || 'Gui email that bai')
     }
     setIsLoading(false)
   }
 
+  // Hiển thị trang xác nhận đã gửi email
   if (isSent) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <Card className="w-full max-w-md animate-fade-in">
           <CardHeader className="text-center">
-            <CardTitle className="text-xl">Check Your Email</CardTitle>
+            <CardTitle className="text-xl">Kiem Tra Email</CardTitle>
             <CardDescription>
-              If an account exists, we've sent a password reset link.
+              Neu tai khoan ton tai, chung toi da gui link dat lai mat khau.
             </CardDescription>
           </CardHeader>
           <CardFooter className="flex justify-center">
             <Link to="/login" className="text-primary hover:underline">
-              Back to Login
+              Quay Lai Dang Nhap
             </Link>
           </CardFooter>
         </Card>
@@ -62,9 +63,9 @@ const ForgotPassword = () => {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md animate-fade-in">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Forgot Password?</CardTitle>
+          <CardTitle className="text-xl">Quen Mat Khau?</CardTitle>
           <CardDescription>
-            Enter your email and we'll send you a reset link.
+            Nhap email, chung toi se gui link dat lai mat khau.
           </CardDescription>
         </CardHeader>
 
@@ -74,7 +75,7 @@ const ForgotPassword = () => {
               <label className="text-sm text-secondary">Email</label>
               <Input
                 type="email"
-                placeholder="you@example.com"
+                placeholder="ban@vi-du.com"
                 {...register('email')}
                 className={errors.email ? 'border-error' : ''}
               />
@@ -84,14 +85,14 @@ const ForgotPassword = () => {
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Sending...' : 'Send Reset Link'}
+              {isLoading ? 'Dang gui...' : 'Gui Link Dat Lai'}
             </Button>
           </form>
         </CardContent>
 
         <CardFooter className="flex justify-center">
           <Link to="/login" className="text-sm text-secondary hover:text-primary">
-            Back to Login
+            Quay Lai Dang Nhap
           </Link>
         </CardFooter>
       </Card>

@@ -1,8 +1,8 @@
 import rateLimit from "express-rate-limit";
 
-// Auth endpoints: 5 attempts per 15 minutes
+// Giới hạn đăng nhập: 5 lần / 1 phút
 export const authLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minutes
+  windowMs: 1 * 60 * 1000,
   max: 5,
   message: {
     success: false,
@@ -12,9 +12,9 @@ export const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// API endpoints: 100 requests per minute
+// Giới hạn API: 100 request / 1 phút
 export const apiLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
+  windowMs: 60 * 1000,
   max: 100,
   message: {
     success: false,
@@ -24,9 +24,9 @@ export const apiLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Story creation: 10 stories per hour
+// Giới hạn tạo story: 10 story / 1 giờ
 export const storyCreationLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
+  windowMs: 60 * 60 * 1000,
   max: 10,
   message: {
     success: false,

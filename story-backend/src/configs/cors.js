@@ -3,7 +3,7 @@ import { config } from "./env.js";
 
 export const corsOptions = {
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, Postman)
+    // Cho phép request không có origin (mobile, Postman)
     if (!origin || config.allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {

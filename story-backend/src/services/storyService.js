@@ -2,6 +2,7 @@ import cloudinary from "../configs/cloudinary.js";
 import fs from "fs";
 import { prisma } from "../prismaClient.js";
 
+// Upload file lên Cloudinary, trả về URL
 export const uploadStoryMedia = async (filePath) => {
   try {
     const result = await cloudinary.uploader.upload(filePath, {
@@ -9,13 +10,14 @@ export const uploadStoryMedia = async (filePath) => {
     });
     return result.secure_url;
   } catch (err) {
-    console.error("Cloudinary upload error:", err);
+    console.error("Loi upload Cloudinary:", err);
     throw err;
   } finally {
-    fs.unlinkSync(filePath); // xóa file tạm
+    fs.unlinkSync(filePath); // Xóa file tạm
   }
 };
 
+// Tạo story mới - tự động hết hạn sau 24h
 export const createStory = async ({ userId, mediaFilePath }) => {
   const mediaUrl = await uploadStoryMedia(mediaFilePath);
 
@@ -23,21 +25,20 @@ export const createStory = async ({ userId, mediaFilePath }) => {
     data: {
       userId,
       mediaUrl,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     },
   });
 
   return story;
 };
 
+// Lấy tất cả story đang hoạt động (chưa hết hạn)
+// Nhóm theo user
 export const getActiveStories = async () => {
   const stories = await prisma.story.findMany({
     where: {
-      expiresAt: {
-        gt: new Date(),
-      },
+      expiresAt: { gt: new Date() },
     },
-
     include: {
       user: {
         select: {
@@ -47,24 +48,19 @@ export const getActiveStories = async () => {
         },
       },
     },
-
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy: { createdAt: "desc" },
   });
 
+  // Nhóm stories theo user
   const groupedStories = {};
-
   for (const story of stories) {
     const userId = story.user.id;
-
     if (!groupedStories[userId]) {
       groupedStories[userId] = {
         user: story.user,
         stories: [],
       };
     }
-
     groupedStories[userId].stories.push({
       id: story.id,
       mediaUrl: story.mediaUrl,
@@ -76,26 +72,25 @@ export const getActiveStories = async () => {
   return Object.values(groupedStories);
 };
 
+// Xóa story - chỉ chủ sở hữu mới được xóa
 export const deleteStory = async (storyId, userId) => {
   const story = await prisma.story.findUnique({
     where: { id: storyId },
   });
-  if (!story) {
-    throw new Error("Story not found");
-  }
-  if (story.userId !== userId) {
-    throw new Error("Unauthorized");
-  }
+  
+  if (!story) throw new Error("Story not found");
+  if (story.userId !== userId) throw new Error("Unauthorized");
+
+  // Xóa ảnh trên Cloudinary
   const publicId = story.mediaUrl.split("/").pop().split(".")[0];
   await cloudinary.uploader.destroy(`stories/${publicId}`);
 
-  await prisma.story.delete({
-    where: { id: storyId },
-  });
+  await prisma.story.delete({ where: { id: storyId } });
 
   return { message: "Story deleted" };
 };
 
+// Lấy story của chính mình
 export const getMyStories = async (userId) => {
   return await prisma.story.findMany({
     where: { userId },
@@ -103,6 +98,7 @@ export const getMyStories = async (userId) => {
   });
 };
 
+// Lấy story theo ID
 export const getStoryById = async (storyId) => {
   const story = await prisma.story.findUnique({
     where: { id: storyId },
@@ -119,9 +115,9 @@ export const getStoryById = async (storyId) => {
       },
     },
   });
-  if (!story) {
-    throw new Error("Story not found");
-  }
+  
+  if (!story) throw new Error("Story not found");
+  
   return {
     ...story,
     viewCount: story._count.StoryView,

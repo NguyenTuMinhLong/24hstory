@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { Avatar } from '@/components/ui/Avatar'
 
+// Ring avatar - hiển thị avatar với border gradient (như Instagram)
 const StoryRing = ({ user, stories, isOwn = false, onClick }) => {
   const hasUnseen = stories?.some((s) => !s.seen)
   const isSeen = stories?.length > 0 && !hasUnseen
@@ -12,6 +13,7 @@ const StoryRing = ({ user, stories, isOwn = false, onClick }) => {
       className="flex flex-col items-center gap-1.5 group"
     >
       <div className="relative">
+        {/* Border ring - gradient cho chưa xem, mờ cho đã xem */}
         <div
           className={cn(
             'p-[2px] rounded-full',
@@ -27,6 +29,7 @@ const StoryRing = ({ user, stories, isOwn = false, onClick }) => {
           <Avatar src={user?.avatar} alt={user?.email} size="default" />
         </div>
 
+        {/* Dấu + cho story của mình */}
         {isOwn && (
           <div className="absolute -bottom-1 -right-1 h-5 w-5 bg-primary text-background rounded-full flex items-center justify-center text-xs font-bold">
             +

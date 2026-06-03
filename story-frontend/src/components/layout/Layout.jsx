@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import { Avatar } from '@/components/ui/Avatar'
 import useAuthStore from '@/stores/authStore'
 
+// Icon navigation item
 const NavItem = ({ to, icon: Icon, label, isActive }) => (
   <Link
     to={to}
@@ -17,6 +18,7 @@ const NavItem = ({ to, icon: Icon, label, isActive }) => (
   </Link>
 )
 
+// Header với logo và user info
 const Header = () => {
   const { user, logout } = useAuthStore()
 
@@ -47,6 +49,7 @@ const Header = () => {
   )
 }
 
+// Navigation bar ở bottom (mobile)
 const BottomNav = () => {
   const location = useLocation()
   const { user } = useAuthStore()
@@ -74,6 +77,7 @@ const BottomNav = () => {
   )
 }
 
+// Layout chính - bao gồm header, content, bottom nav
 const Layout = ({ children }) => {
   return (
     <div className="min-h-screen bg-background">

@@ -10,14 +10,15 @@ import { Button } from '@/components/ui/Button'
 import useAuthStore from '@/stores/authStore'
 import toast from 'react-hot-toast'
 
+// Validate register form
 const registerSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  email: z.string().email('Email khong hop le'),
   password: z
     .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Must contain 1 uppercase letter')
-    .regex(/[0-9]/, 'Must contain 1 number')
-    .regex(/[!@#$%^&*]/, 'Must contain 1 special character (!@#$%^&*)'),
+    .min(8, 'Mat khau it nhat 8 ky tu')
+    .regex(/[A-Z]/, 'Phai co it nhat 1 chu hoa')
+    .regex(/[0-9]/, 'Phai co it nhat 1 chu so')
+    .regex(/[!@#$%^&*]/, 'Phai co it nhat 1 ky tu dac biet (!@#$%^&*)'),
 })
 
 const Register = () => {
@@ -40,10 +41,10 @@ const Register = () => {
     setIsLoading(false)
 
     if (result.success) {
-      toast.success('Account created! Please verify your email.')
+      toast.success('Tai khoan da tao! Vui long xac thuc email.')
       navigate('/login')
     } else {
-      toast.error(result.error || 'Registration failed')
+      toast.error(result.error || 'Dang ky that bai')
     }
   }
 
@@ -52,9 +53,9 @@ const Register = () => {
       <Card className="w-full max-w-md animate-fade-in">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">
-            Create <span className="text-primary">Account</span>
+            Tao <span className="text-primary">Tai Khoan</span>
           </CardTitle>
-          <CardDescription>Join 24hStory today.</CardDescription>
+          <CardDescription>Tham gia 24hStory ngay hom nay.</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -63,7 +64,7 @@ const Register = () => {
               <label className="text-sm text-secondary">Email</label>
               <Input
                 type="email"
-                placeholder="you@example.com"
+                placeholder="ban@vi-du.com"
                 {...register('email')}
                 className={errors.email ? 'border-error' : ''}
               />
@@ -73,11 +74,11 @@ const Register = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm text-secondary">Password</label>
+              <label className="text-sm text-secondary">Mat khau</label>
               <div className="relative">
                 <Input
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Create a strong password"
+                  placeholder="Tao mat khau manh"
                   {...register('password')}
                   className={errors.password ? 'border-error pr-10' : 'pr-10'}
                 />
@@ -99,16 +100,16 @@ const Register = () => {
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Creating account...' : 'Create Account'}
+              {isLoading ? 'Dang tao tai khoan...' : 'Tao Tai Khoan'}
             </Button>
           </form>
         </CardContent>
 
         <CardFooter className="flex justify-center">
           <p className="text-sm text-secondary">
-            Already have an account?{' '}
+            Da co tai khoan?{' '}
             <Link to="/login" className="text-primary hover:underline">
-              Sign in
+              Dang nhap
             </Link>
           </p>
         </CardFooter>

@@ -1,266 +1,181 @@
 # 24hStory
 
-> A modern Instagram-style stories platform with real-time media sharing, user authentication, and seamless cloud integration.
+> Ứng dụng chia sẻ story giống Instagram - story tự xóa sau 24h, có xác thực người dùng, lưu trữ ảnh/video trên đám mây.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green)
 ![License](https://img.shields.io/badge/license-MIT-yellow)
 
-## Overview
+## Tính năng chính
 
-24hStory is a full-stack web application that enables users to share temporary media content with 24-hour expiration. Built with a React frontend and Express.js backend, it features secure JWT authentication, PostgreSQL database with Prisma ORM, and Cloudinary for media storage.
+### Đăng nhập & Bảo mật
+- Đăng ký / đăng nhập bằng email + password
+- Xác thực email
+- Quên mật khẩu / đặt lại mật khẩu
+- Đổi mật khẩu
+- Khóa tài khoản tạm thời khi nhập sai 5 lần
+- Đăng xuất khỏi tất cả thiết bị
 
-## Features
+### Story
+- Đăng ảnh/video - tự động xóa sau 24h
+- Xem story của người khác
+- Xem danh sách ai đã xem story của mình
+- Xóa story của mình
+- Upload avatar cá nhân
 
-### Authentication & Security
-- Email/password registration with email verification
-- JWT-based authentication (access + refresh tokens)
-- Account lockout after 5 failed login attempts
-- Password validation (8+ chars, uppercase, number, special char)
-- Multi-device session management
+## Cách chạy
 
-### Stories
-- Upload images that expire after 24 hours
-- View stories from all users in a unified feed
-- Full-screen story viewer with progress indicators
-- View tracking (see who viewed your stories)
-- Automatic cleanup of expired content
+### 1. Chuẩn bị
 
-### User Profile
-- Custom avatar upload with automatic resizing
-- Profile management
-
-## Tech Stack
-
-### Backend
-| Component | Technology |
-|-----------|------------|
-| Runtime | Node.js (ES Modules) |
-| Framework | Express.js |
-| Database | PostgreSQL + Prisma ORM |
-| Media Storage | Cloudinary |
-| Authentication | JWT (jsonwebtoken) |
-| Password Hashing | bcrypt (12 rounds) |
-| Validation | Zod v4 |
-| Security | Helmet, CORS, Rate Limiting |
-| Scheduler | node-cron |
-| File Upload | Multer |
-| Testing | Jest + Supertest |
-
-### Frontend
-| Component | Technology |
-|-----------|------------|
-| Framework | React 18 |
-| Build Tool | Vite |
-| Routing | React Router DOM v6 |
-| State Management | Zustand |
-| Forms | React Hook Form + Zod |
-| HTTP Client | Axios |
-| Styling | Tailwind CSS |
-| Icons | Lucide React |
-| UI Components | Radix UI |
-
-## Project Structure
-
-```
-24hstory/
-├── story-backend/           # Express.js REST API
-│   ├── src/
-│   │   ├── configs/        # App configurations
-│   │   ├── controllers/     # Request handlers
-│   │   ├── routes/          # API routes
-│   │   ├── services/       # Business logic
-│   │   ├── middlewares/     # Express middlewares
-│   │   ├── validators/      # Zod schemas
-│   │   └── utils/           # Utilities
-│   ├── prisma/
-│   │   └── schema.prisma    # Database schema
-│   └── tests/               # Test files
-│
-└── story-frontend/          # React SPA
-    └── src/
-        ├── components/      # React components
-        ├── pages/           # Page components
-        ├── stores/          # Zustand stores
-        └── lib/             # Utilities
-```
-
-## Getting Started
-
-### Prerequisites
-
+Cần có:
 - Node.js >= 18.0.0
 - PostgreSQL
-- Cloudinary account
+- Tài khoản Cloudinary (miễn phí)
 
-### Installation
+### 2. Cài đặt
 
-1. **Clone the repository**
 ```bash
-git clone <repository-url>
+# Clone code
+git clone <repo-url>
 cd 24hstory
-```
 
-2. **Install dependencies**
-```bash
-# Backend
+# Cài backend
 cd story-backend
 npm install
 
-# Frontend
+# Cài frontend  
 cd ../story-frontend
 npm install
 ```
 
-3. **Configure environment variables**
+### 3. Cấu hình
 
-Create `.env` files in both `story-backend` and `story-frontend`:
+Tạo file `.env` trong `story-backend/`:
 
-**Backend (`story-backend/.env`)**
 ```env
 DATABASE_URL="postgresql://user:password@localhost:5432/24hstory"
-JWT_SECRET="your-jwt-secret"
-JWT_REFRESH_SECRET="your-refresh-secret"
-JWT_EXPIRES_IN="15m"
-CLOUDINARY_CLOUD_NAME="your-cloud-name"
-CLOUDINARY_API_KEY="your-api-key"
-CLOUDINARY_API_SECRET="your-api-secret"
+JWT_SECRET="secret-key-ban-tu-tao"
+JWT_REFRESH_SECRET="refresh-secret-ban-tu-tao"
+CLOUDINARY_CLOUD_NAME="ten-cloud-cua-ban"
+CLOUDINARY_API_KEY="api-key-cua-ban"
+CLOUDINARY_API_SECRET="api-secret-cua-ban"
 PORT=5000
-NODE_ENV="development"
-ALLOWED_ORIGINS="http://localhost:5173"
 ```
 
-**Frontend (`story-frontend/.env`)**
+Tạo file `.env` trong `story-frontend/`:
+
 ```env
 VITE_API_URL="http://localhost:5000"
 ```
 
-4. **Setup database**
+### 4. Khởi tạo database
+
 ```bash
 cd story-backend
 npx prisma generate
 npx prisma db push
 ```
 
-5. **Run the application**
+### 5. Chạy ứng dụng
+
 ```bash
-# Backend (from story-backend)
+# Terminal 1 - Backend
+cd story-backend
 npm run dev
 
-# Frontend (from story-frontend, in another terminal)
+# Terminal 2 - Frontend
+cd story-frontend
 npm run dev
 ```
 
-## API Reference
+Mở trình duyệt: http://localhost:5173
 
-### Authentication
+## Cấu trúc thư mục
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/auth/register` | Register new user |
-| POST | `/auth/login` | Login with credentials |
-| POST | `/auth/refresh` | Refresh access token |
-| POST | `/auth/logout` | Logout |
-| GET | `/auth/verify-email` | Verify email address |
-| POST | `/auth/forgot-password` | Request password reset |
-| POST | `/auth/reset-password` | Reset password |
-| GET | `/auth/me` | Get current user |
-| PATCH | `/auth/avatar` | Update avatar |
+```
+24hstory/
+├── story-backend/           # API server (Express)
+│   └── src/
+│       ├── configs/        # Cấu hình (Cloudinary, CORS, Security...)
+│       ├── controllers/     # Xử lý request
+│       ├── routes/          # Định nghĩa API routes
+│       ├── services/        # Logic nghiệp vụ
+│       ├── middlewares/     # Auth, validate, error handler
+│       ├── validators/      # Zod schemas
+│       └── utils/           # Helpers, cleanup job
+│
+└── story-frontend/          # React app (Vite)
+    └── src/
+        ├── components/      # UI components
+        ├── pages/           # Trang chính
+        ├── stores/          # Zustand state
+        └── lib/             # API client, utils
+```
 
-### Stories
+## API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/stories` | Create new story |
-| GET | `/stories` | Get all active stories |
-| GET | `/stories/me` | Get my stories |
-| GET | `/stories/:id` | Get story by ID |
-| DELETE | `/stories/:id` | Delete story |
+### Auth
+
+| Method | Endpoint | Mô tả |
+|--------|----------|--------|
+| POST | `/auth/register` | Đăng ký tài khoản mới |
+| POST | `/auth/login` | Đăng nhập |
+| POST | `/auth/refresh` | Làm mới token |
+| POST | `/auth/logout` | Đăng xuất |
+| GET | `/auth/verify-email` | Xác thực email |
+| POST | `/auth/forgot-password` | Quên mật khẩu |
+| POST | `/auth/reset-password` | Đặt lại mật khẩu |
+| GET | `/auth/me` | Lấy thông tin user hiện tại |
+| PATCH | `/auth/avatar` | Cập nhật avatar |
+
+### Story
+
+| Method | Endpoint | Mô tả |
+|--------|----------|--------|
+| POST | `/stories` | Tạo story mới |
+| GET | `/stories` | Lấy tất cả story đang hoạt động |
+| GET | `/stories/me` | Lấy story của mình |
+| GET | `/stories/:id` | Lấy story theo ID |
+| DELETE | `/stories/:id` | Xóa story |
 
 ### Story Views
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/story-view/seen/:storyId` | Mark as seen |
-| GET | `/story-view/viewers/:storyId` | Get viewers |
-| GET | `/story-view/my-views` | Get my views |
+| Method | Endpoint | Mô tả |
+|--------|----------|--------|
+| POST | `/story-view/seen/:storyId` | Đánh dấu đã xem |
+| GET | `/story-view/viewers/:storyId` | Xem danh sách người xem |
+| GET | `/story-view/my-views` | Xem story đã xem |
 
-## Environment Variables
+## Công nghệ sử dụng
 
-### Backend
+**Backend:**
+- Node.js + Express
+- PostgreSQL + Prisma ORM
+- Cloudinary (lưu ảnh)
+- JWT (xác thực)
+- bcrypt (mã hóa mật khẩu)
+- Zod (validation)
+- Helmet, CORS, Rate Limiting (bảo mật)
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `DATABASE_URL` | Yes | PostgreSQL connection string |
-| `JWT_SECRET` | Yes | Access token signing secret |
-| `JWT_REFRESH_SECRET` | Yes | Refresh token signing secret |
-| `JWT_EXPIRES_IN` | No | Token expiration (default: 15m) |
-| `CLOUDINARY_CLOUD_NAME` | Yes | Cloudinary cloud name |
-| `CLOUDINARY_API_KEY` | Yes | Cloudinary API key |
-| `CLOUDINARY_API_SECRET` | Yes | Cloudinary API secret |
-| `PORT` | No | Server port (default: 5000) |
-| `NODE_ENV` | No | Environment mode |
-| `ALLOWED_ORIGINS` | No | CORS origins |
+**Frontend:**
+- React 18
+- Vite
+- Tailwind CSS
+- Zustand (state management)
+- React Router DOM
+- React Hook Form + Zod
+- Radix UI
+- Lucide Icons
 
-### Frontend
+## Bảo mật
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `VITE_API_URL` | Yes | Backend API URL |
-
-## Database Schema
-
-### User
-- `id` - Unique identifier
-- `email` - User email (unique)
-- `password` - Hashed password
-- `avatar` - Cloudinary URL
-- `isEmailVerified` - Email verification status
-- `isActive` - Account status
-- `failedLogin` - Failed login attempts
-- `lockedUntil` - Account lockout expiry
-
-### Session
-- `id` - Unique identifier
-- `userId` - Owner reference
-- `token` - JWT token
-- `ipAddress` - Client IP
-- `userAgent` - Browser info
-- `expiresAt` - Session expiry
-
-### Story
-- `id` - Unique identifier
-- `userId` - Owner reference
-- `mediaUrl` - Cloudinary URL
-- `expiresAt` - 24h expiration
-- `createdAt` - Creation timestamp
-
-### StoryView
-- `id` - Unique identifier
-- `storyId` - Story reference
-- `userId` - Viewer reference
-- `viewedAt` - View timestamp
-
-## Security Features
-
-- Password hashing with bcrypt (12 rounds)
-- JWT access tokens (15 min expiry)
-- JWT refresh tokens (7 days expiry)
-- Account lockout after 5 failed attempts (15 min)
-- Rate limiting on auth endpoints
+- Mật khẩu được hash với bcrypt (12 rounds)
+- Access token hết hạn sau 15 phút
+- Refresh token hết hạn sau 7 ngày
+- Rate limiting trên API
+- Input validation với Zod
 - Helmet security headers
-- Input validation with Zod
-- SQL injection prevention via Prisma
-- File type validation for uploads
+- SQL injection prevention qua Prisma
 
 ## License
 
-MIT License - see LICENSE file for details.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
+MIT

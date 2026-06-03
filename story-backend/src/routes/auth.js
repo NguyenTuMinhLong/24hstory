@@ -26,6 +26,7 @@ import {
 
 const router = express.Router();
 
+// Public routes
 router.post("/register", validateRequest(registerSchema), registerController);
 router.post("/login", validateRequest(loginSchema), loginController);
 router.post("/refresh", validateRequest(refreshSchema), refreshController);
@@ -33,25 +34,12 @@ router.post("/logout", logoutController);
 router.get("/verify-email", verifyEmailController);
 router.post("/resend-verification", resendVerificationController);
 router.post("/forgot-password", forgotPasswordController);
-router.post(
-  "/reset-password",
-  validateRequest(resetPasswordSchema),
-  resetPasswordController
-);
+router.post("/reset-password", validateRequest(resetPasswordSchema), resetPasswordController);
 
+// Protected routes
 router.get("/me", authMiddleware, meController);
 router.post("/logout-all", authMiddleware, logoutAllController);
-router.patch(
-  "/password",
-  authMiddleware,
-  validateRequest(changePasswordSchema),
-  changePasswordController
-);
-router.patch(
-  "/avatar",
-  authMiddleware,
-  uploadAvatarMiddleware.single("avatar"),
-  updateAvatarController
-);
+router.patch("/password", authMiddleware, validateRequest(changePasswordSchema), changePasswordController);
+router.patch("/avatar", authMiddleware, uploadAvatarMiddleware.single("avatar"), updateAvatarController);
 
 export default router;

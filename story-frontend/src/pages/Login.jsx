@@ -10,9 +10,10 @@ import { Button } from '@/components/ui/Button'
 import useAuthStore from '@/stores/authStore'
 import toast from 'react-hot-toast'
 
+// Validate login form
 const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(1, 'Password is required'),
+  email: z.string().email('Email khong hop le'),
+  password: z.string().min(1, 'Mat khau khong duoc trong'),
 })
 
 const Login = () => {
@@ -35,10 +36,10 @@ const Login = () => {
     setIsLoading(false)
 
     if (result.success) {
-      toast.success('Welcome back!')
+      toast.success('Chao mung tro lai!')
       navigate('/')
     } else {
-      toast.error(result.error || 'Login failed')
+      toast.error(result.error || 'Dang nhap that bai')
     }
   }
 
@@ -49,7 +50,7 @@ const Login = () => {
           <CardTitle className="text-2xl">
             <span className="text-primary">24h</span>Story
           </CardTitle>
-          <CardDescription>Welcome back. Sign in to continue.</CardDescription>
+          <CardDescription>Chao mung ban tro lai. Dang nhap de tiep tuc.</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -58,7 +59,7 @@ const Login = () => {
               <label className="text-sm text-secondary">Email</label>
               <Input
                 type="email"
-                placeholder="you@example.com"
+                placeholder="ban@vi-du.com"
                 {...register('email')}
                 className={errors.email ? 'border-error' : ''}
               />
@@ -68,11 +69,11 @@ const Login = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm text-secondary">Password</label>
+              <label className="text-sm text-secondary">Mat khau</label>
               <div className="relative">
                 <Input
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter your password"
+                  placeholder="Nhap mat khau"
                   {...register('password')}
                   className={errors.password ? 'border-error pr-10' : 'pr-10'}
                 />
@@ -90,7 +91,7 @@ const Login = () => {
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? 'Dang dang nhap...' : 'Dang Nhap'}
             </Button>
           </form>
         </CardContent>
@@ -100,12 +101,12 @@ const Login = () => {
             to="/forgot-password"
             className="text-sm text-secondary hover:text-primary transition-colors"
           >
-            Forgot password?
+            Quen mat khau?
           </Link>
           <p className="text-sm text-secondary">
-            Don't have an account?{' '}
+            Chua co tai khoan?{' '}
             <Link to="/register" className="text-primary hover:underline">
-              Sign up
+              Dang ky
             </Link>
           </p>
         </CardFooter>

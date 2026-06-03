@@ -10,11 +10,13 @@ import Home from './pages/Home'
 import MyStories from './pages/MyStories'
 import Profile from './pages/Profile'
 
+// Route bảo vệ - cần đăng nhập mới vào được
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuthStore()
   return isAuthenticated ? children : <Navigate to="/login" replace />
 }
 
+// Route công khai - chưa đăng nhập mới vào được
 const PublicRoute = ({ children }) => {
   const { isAuthenticated } = useAuthStore()
   return isAuthenticated ? <Navigate to="/" replace /> : children
@@ -23,6 +25,7 @@ const PublicRoute = ({ children }) => {
 const AppContent = () => {
   const { fetchUser } = useAuthStore()
 
+  // Kiểm tra đăng nhập khi app load
   useEffect(() => {
     fetchUser()
   }, [fetchUser])
@@ -30,54 +33,12 @@ const AppContent = () => {
   return (
     <>
       <Routes>
-        <Route
-          path="/login"
-          element={
-            <PublicRoute>
-              <Login />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <PublicRoute>
-              <Register />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/forgot-password"
-          element={
-            <PublicRoute>
-              <ForgotPassword />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/stories"
-          element={
-            <ProtectedRoute>
-              <MyStories />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+        <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+        <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+        <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+        <Route path="/stories" element={<ProtectedRoute><MyStories /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 

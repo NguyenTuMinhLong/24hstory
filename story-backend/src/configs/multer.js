@@ -2,13 +2,11 @@ import multer from "multer";
 import path from "path";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/webm"];
 
 const fileFilter = (req, file, cb) => {
   const allowedTypes = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES];
-
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
@@ -16,6 +14,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+// Lưu file tạm vào thư mục tmp/
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "tmp/");
@@ -37,15 +36,13 @@ const avatarFilter = (req, file, cb) => {
 
 export const uploadAvatarMiddleware = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max for avatar
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max cho avatar
   fileFilter: avatarFilter,
 });
 
 export const upload = multer({
   storage,
-  limits: {
-    fileSize: MAX_FILE_SIZE,
-  },
+  limits: { fileSize: MAX_FILE_SIZE },
   fileFilter,
 });
 

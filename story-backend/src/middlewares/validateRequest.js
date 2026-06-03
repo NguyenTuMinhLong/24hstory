@@ -1,3 +1,4 @@
+// Middleware validate request body/params/query bằng Zod schema
 export const validateRequest = (schema, source = 'body') => {
     return (req, res, next) => {
         const dataToValidate = source === 'body' ? req.body : source === 'params' ? req.params : req.query;
@@ -19,5 +20,3 @@ export const validateRequest = (schema, source = 'body') => {
         next();
     };
 };
-
-

@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 
+// Stack effect - hiển thị nhiều story như chồng đống
 const StoryStack = ({ stories, currentIndex, onNext, onPrev }) => {
   const visibleStories = stories?.slice(currentIndex, currentIndex + 3) || []
   const stackRef = useRef(null)
 
+  // Hiệu ứng perspective khi mount
   useEffect(() => {
     if (stackRef.current) {
       stackRef.current.style.transform = 'perspective(1000px) rotateY(-5deg)'
@@ -48,6 +50,7 @@ const StoryStack = ({ stories, currentIndex, onNext, onPrev }) => {
               onClick={onNext}
             />
 
+            {/* Gradient overlay cho story trên cùng */}
             {isTop && (
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             )}

@@ -1,5 +1,6 @@
 import "dotenv/config";
 
+// Kiểm tra các biến môi trường bắt buộc
 const requiredEnvVars = [
   "DATABASE_URL",
   "JWT_SECRET",
@@ -15,7 +16,7 @@ if (missingVars.length > 0) {
   process.exit(1);
 }
 
-// Optional env vars with defaults
+// Các biến tùy chọn có giá trị mặc định
 export const config = {
   port: process.env.PORT || 5000,
   nodeEnv: process.env.NODE_ENV || "development",

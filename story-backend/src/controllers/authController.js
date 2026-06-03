@@ -13,6 +13,7 @@ import {
   updateAvatar,
 } from "../services/authService.js";
 
+// Helper xử lý lỗi - 401 cho "Invalid", 400 cho các lỗi khác
 const handleError = (res, err) => {
   const status = err.message.includes("Invalid") ? 401 : 400;
   res.status(status).json({ message: err.message });

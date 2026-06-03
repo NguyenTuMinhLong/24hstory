@@ -8,12 +8,14 @@ const useAuthStore = create((set, get) => ({
 
   setUser: (user) => set({ user, isAuthenticated: !!user }),
 
+  // Đăng nhập
   login: async (email, password) => {
     set({ isLoading: true })
     try {
       const response = await api.post('/auth/login', { email, password })
       const { accessToken, refreshToken, user } = response.data
 
+      // Lưu token
       localStorage.setItem('accessToken', accessToken)
       localStorage.setItem('refreshToken', refreshToken)
 
@@ -25,6 +27,7 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
+  // Đăng ký
   register: async (email, password) => {
     set({ isLoading: true })
     try {
@@ -37,18 +40,20 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
+  // Đăng xuất
   logout: async () => {
     try {
       const refreshToken = localStorage.getItem('refreshToken')
       await api.post('/auth/logout', { refreshToken })
     } catch (error) {
-      // Continue logout even if API fails
+      // Vẫn tiếp tục đăng xuất dù API lỗi
     }
     localStorage.removeItem('accessToken')
     localStorage.removeItem('refreshToken')
     set({ user: null, isAuthenticated: false })
   },
 
+  // Đăng xuất khỏi tất cả thiết bị
   logoutAll: async () => {
     set({ isLoading: true })
     try {
@@ -63,6 +68,7 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
+  // Lấy thông tin user hiện tại
   fetchUser: async () => {
     const token = localStorage.getItem('accessToken')
     if (!token) {
@@ -80,6 +86,7 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
+  // Đổi mật khẩu
   changePassword: async (currentPassword, newPassword) => {
     set({ isLoading: true })
     try {
@@ -92,6 +99,7 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
+  // Cập nhật avatar
   updateAvatar: async (file) => {
     set({ isLoading: true })
     try {

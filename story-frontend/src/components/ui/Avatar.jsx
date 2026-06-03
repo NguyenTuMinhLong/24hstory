@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils'
 
+// Avatar component - hiển thị hình đại diện
 const Avatar = ({ src, alt, className, size = 'default' }) => {
   const sizes = {
     sm: 'h-8 w-8 text-xs',

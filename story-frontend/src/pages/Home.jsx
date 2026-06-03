@@ -10,6 +10,7 @@ const Home = () => {
   const { stories, fetchActiveStories, isLoading } = useStoryStore()
   const [isInitialLoading, setIsInitialLoading] = useState(true)
 
+  // Load data khi mount
   useEffect(() => {
     const loadData = async () => {
       await fetchUser()
@@ -20,7 +21,7 @@ const Home = () => {
   }, [fetchUser, fetchActiveStories])
 
   const handleAddStory = () => {
-    // Navigate to create story page
+    // Chuyen den trang tao story
     window.location.href = '/stories'
   }
 
@@ -37,10 +38,11 @@ const Home = () => {
   return (
     <Layout>
       <div className="space-y-6 animate-fade-in">
+        {/* Story bar - hien thi danh sach story */}
         <StoryBar currentUser={user} onAddStory={handleAddStory} />
 
         <div className="mt-8">
-          <h2 className="text-lg font-medium text-text mb-4">Recent Activity</h2>
+          <h2 className="text-lg font-medium text-text mb-4">Hoat Dong Gan Day</h2>
           
           {isLoading ? (
             <div className="flex items-center justify-center h-32">
@@ -48,12 +50,12 @@ const Home = () => {
             </div>
           ) : stories.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-secondary mb-2">No stories yet</p>
-              <p className="text-sm text-muted">Follow people or create your first story!</p>
+              <p className="text-secondary mb-2">Chua co story nao</p>
+              <p className="text-sm text-muted">Theo doi nguoi khac hoac tao story dau tien!</p>
             </div>
           ) : (
             <p className="text-sm text-secondary">
-              {stories.length} user{stories.length !== 1 ? 's' : ''} with active stories
+              {stories.length} nguoi co story dang hoat dong
             </p>
           )}
         </div>

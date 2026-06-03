@@ -38,6 +38,7 @@ export const deleteStoryController = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 export const getMyStoriesController = async (req, res) => {
   try {
     const stories = await getMyStories(req.user.id);
@@ -46,6 +47,7 @@ export const getMyStoriesController = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 export const getStoryByIdController = async (req, res) => {
   try {
     const story = await getStoryById(req.params.storyId);

@@ -1,17 +1,16 @@
 import cron from 'node-cron';
 import { prisma } from '../prismaClient.js';
-import cloudinary from '../configs/cloudinary.js';
 
-// Schedule a cleanup job to run every day at midnight
-cron.schedule(' 0 0 * * *', async () => {
+// Job chạy mỗi ngày lúc nửa đêm - xóa story đã hết hạn
+cron.schedule('0 0 * * *', async () => {
     try {
         const deleted = await prisma.story.deleteMany({
             where: {
                 expiresAt: { lt: new Date() },
             },
         });
-        console.log(`Deleted ${deleted.count} expired stories`);
+        console.log(`Da xoa ${deleted.count} story het han`);
     } catch (err) {
-        console.error('Error during cleanup job:', err);
+        console.error('Loi khi chay cleanup job:', err);
     }
-    });
+});

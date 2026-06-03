@@ -1,5 +1,6 @@
 import { prisma } from "../prismaClient.js";
 
+// Đánh dấu story đã được xem (upsert - tạo mới hoặc cập nhật thời gian)
 export const markStoryAsSeen = async ({ userId, storyId }) => {
   return await prisma.storyView.upsert({
     where: {
@@ -15,6 +16,7 @@ export const markStoryAsSeen = async ({ userId, storyId }) => {
   });
 };
 
+// Lấy danh sách người đã xem một story
 export const getStoryViewers = async (storyId) => {
   return await prisma.storyView.findMany({
     where: { storyId },
@@ -22,6 +24,7 @@ export const getStoryViewers = async (storyId) => {
   });
 };
 
+// Lấy danh sách story mà user đã xem
 export const getMySeenStories = async (userId) => {
   return await prisma.storyView.findMany({
     where: { userId },

@@ -11,22 +11,23 @@ import { Input } from '@/components/ui/Input'
 import useAuthStore from '@/stores/authStore'
 import toast from 'react-hot-toast'
 
+// Validate change password form
 const changePasswordSchema = z.object({
-  currentPassword: z.string().min(1, 'Current password is required'),
+  currentPassword: z.string().min(1, 'Mat khau hien tai khong duoc trong'),
   newPassword: z
     .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Must contain 1 uppercase letter')
-    .regex(/[0-9]/, 'Must contain 1 number')
-    .regex(/[!@#$%^&*]/, 'Must contain 1 special character'),
+    .min(8, 'Mat khau it nhat 8 ky tu')
+    .regex(/[A-Z]/, 'Phai co it nhat 1 chu hoa')
+    .regex(/[0-9]/, 'Phai co it nhat 1 chu so')
+    .regex(/[!@#$%^&*]/, 'Phai co it nhat 1 ky tu dac biet'),
 }).refine((data) => data.currentPassword !== data.newPassword, {
-  message: 'New password must be different',
+  message: 'Mat khau moi phai khac mat khau cu',
   path: ['newPassword'],
 })
 
 const Profile = () => {
   const navigate = useNavigate()
-  const { user, updateAvatar, changePassword, logout, logoutAll, logoutAllDevices } = useAuthStore()
+  const { user, updateAvatar, changePassword, logout, logoutAll } = useAuthStore()
   const fileInputRef = useRef(null)
   const [isChangingPassword, setIsChangingPassword] = useState(false)
   const [showPasswordForm, setShowPasswordForm] = useState(false)
@@ -40,56 +41,61 @@ const Profile = () => {
     resolver: zodResolver(changePasswordSchema),
   })
 
+  // Upload avatar
   const handleAvatarChange = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
 
     if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image')
+      toast.error('Vui long chon mot anh')
       return
     }
 
     const result = await updateAvatar(file)
     if (result.success) {
-      toast.success('Avatar updated!')
+      toast.success('Da cap nhat avatar!')
     } else {
-      toast.error(result.error || 'Failed to update avatar')
+      toast.error(result.error || 'Cap nhat avatar that bai')
     }
   }
 
+  // Submit doi mat khau
   const onPasswordSubmit = async (data) => {
     setIsChangingPassword(true)
     const result = await changePassword(data.currentPassword, data.newPassword)
     setIsChangingPassword(false)
 
     if (result.success) {
-      toast.success('Password changed!')
+      toast.success('Da doi mat khau!')
       reset()
       setShowPasswordForm(false)
     } else {
-      toast.error(result.error || 'Failed to change password')
+      toast.error(result.error || 'Doi mat khau that bai')
     }
   }
 
+  // Dang xuat
   const handleLogout = async () => {
     await logout()
-    toast.success('Logged out!')
+    toast.success('Da dang xuat!')
     navigate('/login')
   }
 
+  // Dang xuat tat ca thiet bi
   const handleLogoutAll = async () => {
-    if (!confirm('Logout from all devices?')) return
+    if (!confirm('Dang xuat khoi tat ca thiet bi?')) return
     const result = await logoutAll()
     if (result.success) {
-      toast.success('Logged out from all devices!')
+      toast.success('Da dang xuat khoi tat ca thiet bi!')
       navigate('/login')
     } else {
       toast.error(result.error)
     }
   }
 
+  // Format ngay thanh thanh
   const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-US', {
+    return new Date(date).toLocaleDateString('vi-VN', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -99,6 +105,7 @@ const Profile = () => {
   return (
     <Layout>
       <div className="max-w-md mx-auto space-y-6 animate-fade-in">
+        {/* Profile header */}
         <div className="text-center py-8">
           <div className="relative inline-block">
             <Avatar src={user?.avatar} alt={user?.email} size="xl" />
@@ -122,19 +129,21 @@ const Profile = () => {
           <p className="text-sm text-secondary">{user?.email}</p>
           {user?.createdAt && (
             <p className="text-xs text-muted mt-1">
-              Member since {formatDate(user.createdAt)}
+              Tham gia tu ngay {formatDate(user.createdAt)}
             </p>
           )}
         </div>
 
+        {/* Actions */}
         <div className="space-y-3">
+          {/* Doi mat khau */}
           <Button
             variant="outline"
             className="w-full justify-start"
             onClick={() => setShowPasswordForm(!showPasswordForm)}
           >
             <Key size={18} className="mr-3" />
-            {showPasswordForm ? 'Cancel' : 'Change Password'}
+            {showPasswordForm ? 'Huy' : 'Doi Mat Khau'}
           </Button>
 
           {showPasswordForm && (
@@ -143,10 +152,10 @@ const Profile = () => {
               className="space-y-3 p-4 bg-card rounded-lg border border-border animate-slide-up"
             >
               <div className="space-y-2">
-                <label className="text-sm text-secondary">Current Password</label>
+                <label className="text-sm text-secondary">Mat Khau Hien Tai</label>
                 <Input
                   type="password"
-                  placeholder="Enter current password"
+                  placeholder="Nhap mat khau hien tai"
                   {...register('currentPassword')}
                   className={errors.currentPassword ? 'border-error' : ''}
                 />
@@ -155,10 +164,10 @@ const Profile = () => {
                 )}
               </div>
               <div className="space-y-2">
-                <label className="text-sm text-secondary">New Password</label>
+                <label className="text-sm text-secondary">Mat Khau Moi</label>
                 <Input
                   type="password"
-                  placeholder="Enter new password"
+                  placeholder="Nhap mat khau moi"
                   {...register('newPassword')}
                   className={errors.newPassword ? 'border-error' : ''}
                 />
@@ -172,27 +181,29 @@ const Profile = () => {
                 ) : (
                   <Check size={18} className="mr-2" />
                 )}
-                Update Password
+                Cap Nhat Mat Khau
               </Button>
             </form>
           )}
 
+          {/* Dang xuat tat ca thiet bi */}
           <Button
             variant="ghost"
             className="w-full justify-start text-error hover:text-error hover:bg-error/10"
             onClick={handleLogoutAll}
           >
             <LogOut size={18} className="mr-3" />
-            Logout All Devices
+            Dang Xuat Tat Ca Thiet Bi
           </Button>
 
+          {/* Dang xuat */}
           <Button
             variant="ghost"
             className="w-full justify-start text-secondary hover:text-error"
             onClick={handleLogout}
           >
             <X size={18} className="mr-3" />
-            Logout
+            Dang Xuat
           </Button>
         </div>
       </div>

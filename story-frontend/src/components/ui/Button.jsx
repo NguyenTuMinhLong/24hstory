@@ -1,6 +1,7 @@
 import { forwardRef } from 'react'
 import { cn } from '@/lib/utils'
 
+// Button component với nhiều variants
 const Button = forwardRef(({ className, variant = 'default', size = 'default', ...props }, ref) => {
   const variants = {
     default: 'bg-card border-border text-text hover:border-primary',

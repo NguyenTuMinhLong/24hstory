@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { Layout } from '@/components/layout/Layout'
 import { Button } from '@/components/ui/Button'
-import { Avatar } from '@/components/ui/Avatar'
 import useAuthStore from '@/stores/authStore'
 import useStoryStore from '@/stores/storyStore'
 import { Loader2, Upload, Trash2, Eye, Image as ImageIcon } from 'lucide-react'
@@ -15,15 +14,17 @@ const MyStories = () => {
   const [preview, setPreview] = useState(null)
   const [isUploading, setIsUploading] = useState(false)
 
+  // Load stories khi mount
   useEffect(() => {
     fetchMyStories()
   }, [fetchMyStories])
 
+  // Chon file
   const handleFileSelect = (e) => {
     const file = e.target.files?.[0]
     if (file) {
       if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
-        toast.error('Please select an image or video')
+        toast.error('Vui long chon anh hoac video')
         return
       }
       setSelectedFile(file)
@@ -31,6 +32,7 @@ const MyStories = () => {
     }
   }
 
+  // Upload story
   const handleUpload = async () => {
     if (!selectedFile) return
 
@@ -39,28 +41,30 @@ const MyStories = () => {
     setIsUploading(false)
 
     if (result.success) {
-      toast.success('Story created!')
+      toast.success('Da tao story!')
       setSelectedFile(null)
       setPreview(null)
       fetchMyStories()
     } else {
-      toast.error(result.error || 'Failed to create story')
+      toast.error(result.error || 'Tao story that bai')
     }
   }
 
+  // Xoa story
   const handleDelete = async (storyId) => {
-    if (!confirm('Delete this story?')) return
+    if (!confirm('Xoa story nay?')) return
 
     const result = await deleteStory(storyId)
     if (result.success) {
-      toast.success('Story deleted')
+      toast.success('Da xoa story')
     } else {
-      toast.error(result.error || 'Failed to delete story')
+      toast.error(result.error || 'Xoa that bai')
     }
   }
 
+  // Format ngay thang
   const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-US', {
+    return new Date(date).toLocaleDateString('vi-VN', {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
@@ -71,20 +75,22 @@ const MyStories = () => {
   return (
     <Layout>
       <div className="space-y-6 animate-fade-in">
+        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold text-text">My Stories</h1>
-            <p className="text-sm text-secondary">Create and manage your stories</p>
+            <h1 className="text-xl font-semibold text-text">Story Cua Toi</h1>
+            <p className="text-sm text-secondary">Tao va quan ly story</p>
           </div>
           <Button
             onClick={() => fileInputRef.current?.click()}
             disabled={isLoading}
           >
             <Upload size={18} className="mr-2" />
-            Create Story
+            Tao Story
           </Button>
         </div>
 
+        {/* File input an */}
         <input
           type="file"
           ref={fileInputRef}
@@ -93,10 +99,11 @@ const MyStories = () => {
           className="hidden"
         />
 
+        {/* Preview popup */}
         {preview && (
           <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
             <div className="bg-card rounded-lg border border-border max-w-md w-full p-4 animate-scale-in">
-              <h3 className="text-lg font-medium text-text mb-4">Preview</h3>
+              <h3 className="text-lg font-medium text-text mb-4">Xem truoc</h3>
               <div className="aspect-[9/16] max-h-[400px] bg-surface rounded-lg overflow-hidden mb-4">
                 {selectedFile?.type.startsWith('video') ? (
                   <video src={preview} controls className="w-full h-full object-contain" />
@@ -113,7 +120,7 @@ const MyStories = () => {
                     setPreview(null)
                   }}
                 >
-                  Cancel
+                  Huy
                 </Button>
                 <Button
                   className="flex-1"
@@ -125,28 +132,31 @@ const MyStories = () => {
                   ) : (
                     <Upload size={18} className="mr-2" />
                   )}
-                  Upload
+                  Tai Len
                 </Button>
               </div>
             </div>
           </div>
         )}
 
+        {/* Loading state */}
         {isLoading ? (
           <div className="flex items-center justify-center h-64">
             <Loader2 className="animate-spin text-primary" size={32} />
           </div>
         ) : myStories.length === 0 ? (
+          // Empty state
           <div className="text-center py-12 border border-dashed border-border rounded-lg">
             <ImageIcon size={48} className="mx-auto text-muted mb-4" />
-            <p className="text-secondary mb-2">No stories yet</p>
-            <p className="text-sm text-muted mb-4">Create your first story to share with others</p>
+            <p className="text-secondary mb-2">Chua co story nao</p>
+            <p className="text-sm text-muted mb-4">Tao story dau tien de chia se voi moi nguoi</p>
             <Button onClick={() => fileInputRef.current?.click()}>
               <Upload size={18} className="mr-2" />
-              Create Story
+              Tao Story
             </Button>
           </div>
         ) : (
+          // Story grid
           <div className="grid grid-cols-3 gap-2">
             {myStories.map((story) => (
               <div
@@ -158,6 +168,7 @@ const MyStories = () => {
                   alt="Story"
                   className="w-full h-full object-cover"
                 />
+                {/* Hover overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="flex items-center gap-1 text-xs text-white">

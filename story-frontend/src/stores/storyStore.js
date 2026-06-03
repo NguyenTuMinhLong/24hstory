@@ -10,6 +10,7 @@ const useStoryStore = create((set, get) => ({
 
   setStories: (stories) => set({ stories }),
 
+  // Lấy tất cả story đang hoạt động
   fetchActiveStories: async () => {
     set({ isLoading: true, error: null })
     try {
@@ -20,6 +21,7 @@ const useStoryStore = create((set, get) => ({
     }
   },
 
+  // Lấy story của mình
   fetchMyStories: async () => {
     set({ isLoading: true, error: null })
     try {
@@ -30,6 +32,7 @@ const useStoryStore = create((set, get) => ({
     }
   },
 
+  // Tạo story mới
   createStory: async (file) => {
     set({ isLoading: true, error: null })
     try {
@@ -48,6 +51,7 @@ const useStoryStore = create((set, get) => ({
     }
   },
 
+  // Xóa story
   deleteStory: async (storyId) => {
     set({ isLoading: true, error: null })
     try {
@@ -63,14 +67,16 @@ const useStoryStore = create((set, get) => ({
     }
   },
 
+  // Đánh dấu đã xem story
   markAsSeen: async (storyId) => {
     try {
       await api.post(`/story-view/seen/${storyId}`)
     } catch (error) {
-      console.error('Failed to mark story as seen:', error)
+      console.error('Loi khi danh dau da xem:', error)
     }
   },
 
+  // Lấy danh sách người xem story
   getStoryViewers: async (storyId) => {
     try {
       const response = await api.get(`/story-view/viewers/${storyId}`)

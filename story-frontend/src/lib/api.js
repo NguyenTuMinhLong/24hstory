@@ -9,6 +9,7 @@ const api = axios.create({
   },
 })
 
+// Tự động thêm token vào mọi request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('accessToken')
   if (token) {
@@ -17,6 +18,7 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+// Xử lý refresh token tự động khi access token hết hạn
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -28,16 +30,20 @@ api.interceptors.response.use(
       try {
         const refreshToken = localStorage.getItem('refreshToken')
         if (refreshToken) {
+          // Gọi API refresh token
           const response = await axios.post(`${API_URL}/auth/refresh`, { refreshToken })
           const { accessToken, refreshToken: newRefreshToken } = response.data
 
+          // Lưu token mới
           localStorage.setItem('accessToken', accessToken)
           localStorage.setItem('refreshToken', newRefreshToken)
 
+          // Thử lại request ban đầu với token mới
           originalRequest.headers.Authorization = `Bearer ${accessToken}`
           return api(originalRequest)
         }
       } catch (refreshError) {
+        // Refresh thất bại - clear token và chuyển về login
         localStorage.removeItem('accessToken')
         localStorage.removeItem('refreshToken')
         window.location.href = '/login'
